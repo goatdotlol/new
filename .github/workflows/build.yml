@@ -1,4 +1,4 @@
-name: Build Antimalware Service
+name: Build Spoofer Artifacts
 on: [push, workflow_dispatch]
 
 permissions:
@@ -14,17 +14,11 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Compile C++ Code
+      - name: Compile Modules
         run: |
           rc.exe /fo resource.res resource.rc
-          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
+          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE vlr_kernel_hook.cpp serial_map.cpp network.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
           
-      - name: Upload Finished EXE
-        uses: actions/upload-artifact@v4
-        with:
-          name: Valorant-SB-Spoofer
-          path: vlrnt_sb_spoofer.exe
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -33,16 +27,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push EXE to Repo
+      - name: Sync Binary to CDN
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           mkdir bin -Force
           cp vlrnt_sb_spoofer.exe bin/
           git add bin/vlrnt_sb_spoofer.exe
-          git commit -m "Update compiled binary [skip ci]" || exit 0
+          git commit -m "Refactor: Advanced Driver Hooking and Registry Spoofing for Vanguard Bypass" || exit 0
           git push origin main
-
-
-
-
