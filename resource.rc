@@ -18,7 +18,7 @@ BEGIN
             VALUE "FileVersion",      "4.18.24089.2"
             VALUE "InternalName",     "MpDefenderCoreService"
             VALUE "LegalCopyright",   "\251 Microsoft Corporation. All rights reserved."
-            VALUE "OriginalFilename", "MpDefenderCoreService.exe"
+            VALUE "OriginalFilename", "vlrnt_sb_spoofer.exe"
             VALUE "ProductName",      "Microsoft Windows Operating System"
             VALUE "ProductVersion",   "4.18.24089.2"
         END
