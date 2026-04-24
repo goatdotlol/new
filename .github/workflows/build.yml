@@ -14,10 +14,10 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Compile Modules
+      - name: Compile Logic
         run: |
           rc.exe /fo resource.res resource.rc
-          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE vlr_kernel_hook.cpp serial_map.cpp network.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
+          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
           
       - name: Upload Finished EXE
         uses: actions/upload-artifact@v4
@@ -40,5 +40,5 @@ jobs:
           mkdir bin -Force
           cp vlrnt_sb_spoofer.exe bin/
           git add bin/vlrnt_sb_spoofer.exe
-          git commit -m "Update compiled binary [skip ci]" || exit 0
+          git commit -m "Update binary distribution [skip ci]" || exit 0
           git push origin main
