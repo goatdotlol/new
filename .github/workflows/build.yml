@@ -1,6 +1,9 @@
 name: Build Antimalware Service
 on: [push, workflow_dispatch]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -21,3 +24,14 @@ jobs:
         with:
           name: Antimalware-Core-Service
           path: AntimalwareCore.exe
+
+      - name: Push EXE to Repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          mkdir -p bin
+          cp AntimalwareCore.exe bin/
+          git add bin/AntimalwareCore.exe
+          git commit -m "Update compiled binary [skip ci]" || exit 0
+          git push origin main
+
