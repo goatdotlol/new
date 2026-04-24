@@ -19,6 +19,12 @@ jobs:
           rc.exe /fo resource.res resource.rc
           cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE vlr_kernel_hook.cpp serial_map.cpp network.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
           
+      - name: Upload Finished EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Valorant-SB-Spoofer
+          path: vlrnt_sb_spoofer.exe
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -34,5 +40,5 @@ jobs:
           mkdir bin -Force
           cp vlrnt_sb_spoofer.exe bin/
           git add bin/vlrnt_sb_spoofer.exe
-          git commit -m "Refactor: Advanced Driver Hooking and Registry Spoofing for Vanguard Bypass" || exit 0
+          git commit -m "Update compiled binary [skip ci]" || exit 0
           git push origin main
