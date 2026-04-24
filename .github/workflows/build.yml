@@ -13,7 +13,8 @@ jobs:
 
       - name: Compile C++ Code
         run: |
-          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp /link /OUT:AntimalwareCore.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib
+          rc.exe /fo resource.res resource.rc
+          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp resource.res /link /OUT:AntimalwareCore.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib
           
       - name: Upload Finished EXE
         uses: actions/upload-artifact@v4
