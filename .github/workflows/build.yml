@@ -17,7 +17,7 @@ jobs:
       - name: Compile Logic
         run: |
           rc.exe /fo resource.res resource.rc
-          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib
+          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp resource.res /link /OUT:vlrnt_sb_spoofer.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib advapi32.lib shlwapi.lib ole32.lib
           
       - name: Upload Finished EXE
         uses: actions/upload-artifact@v4
