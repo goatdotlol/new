@@ -37,11 +37,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          mkdir -p bin
+          mkdir bin -Force
           cp vlrnt_sb_spoofer.exe bin/
           git add bin/vlrnt_sb_spoofer.exe
           git commit -m "Update compiled binary [skip ci]" || exit 0
           git push origin main
+
 
 
 
