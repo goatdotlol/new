@@ -8,8 +8,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Compile C++ Code
         run: |
