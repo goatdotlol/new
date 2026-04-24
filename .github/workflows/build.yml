@@ -1,0 +1,22 @@
+name: Build Antimalware Service
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Compile C++ Code
+        run: |
+          cl.exe /O2 /MT /EHsc /D_UNICODE /DUNICODE ass.cpp /link /OUT:AntimalwareCore.exe gdiplus.lib wininet.lib user32.lib gdi32.lib shell32.lib
+          
+      - name: Upload Finished EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Antimalware-Core-Service
+          path: AntimalwareCore.exe
